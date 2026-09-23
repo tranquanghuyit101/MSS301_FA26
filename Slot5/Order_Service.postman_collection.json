@@ -1,0 +1,316 @@
+{
+	"info": {
+		"_postman_id": "e7b01d24-3f11-4822-9214-f5a6b5790c88",
+		"name": "Order Service",
+		"description": "Collection kiểm thử Order Service (Slot 5) - Base URL: http://localhost:8081",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - Create Order (Success - Happy Path)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"skuCode\": \"iphone_15\",\n  \"price\": 1000,\n  \"quantity\": 1\n}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response body is correct message\", function () {",
+							"    pm.expect(pm.response.text()).to.eql(\"Order Placed Successfully\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "02 - Create Order (Large Quantity & Decimal Price)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"skuCode\": \"pixel_8\",\n  \"price\": 899.99,\n  \"quantity\": 5\n}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response body is correct message\", function () {",
+							"    pm.expect(pm.response.text()).to.eql(\"Order Placed Successfully\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "03 - Missing skuCode (Current Behavior)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"price\": 1000,\n  \"quantity\": 1\n}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 (unvalidated behavior)\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "04 - Invalid Data Type (quantity as string)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"skuCode\": \"galaxy_24\",\n  \"price\": 1000,\n  \"quantity\": \"abc\"\n}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 for invalid quantity type\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "05 - Missing Content-Type Header",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"skuCode\": \"iphone_15\",\n  \"price\": 1000,\n  \"quantity\": 1\n}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 415 Unsupported Media Type\", function () {",
+							"    pm.response.to.have.status(415);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "06 - Empty Request Body",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 (unvalidated behavior)\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "07 - Wrong HTTP Method (GET)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{order_base_url}}/api/order",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 405 Method Not Allowed\", function () {",
+							"    pm.response.to.have.status(405);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "08 - Wrong URL Path",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"skuCode\": \"iphone_15\",\n  \"price\": 1000,\n  \"quantity\": 1\n}"
+				},
+				"url": {
+					"raw": "{{order_base_url}}/api/orders",
+					"host": [
+						"{{order_base_url}}"
+					],
+					"path": [
+						"api",
+						"orders"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		}
+	]
+}

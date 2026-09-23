@@ -7,12 +7,12 @@
 
 ## 0. Checklist chuẩn bị trước khi test
 
-- [ ] Docker container `mysql` đang chạy (`docker ps` thấy container `mysql` status `Up`)
-- [ ] Database `order_service` đã tồn tại (kiểm tra qua DBeaver/Adminer/CLI)
-- [ ] `order-service` đã chạy thành công (`mvn spring-boot:run`), log không có lỗi Flyway
-- [ ] Log xác nhận Flyway đã áp dụng `V1__init.sql` (dòng `Successfully applied 1 migration`)
-- [ ] Bảng `t_orders` đã tồn tại (rỗng, chưa có dữ liệu)
-- [ ] Postman đã cài đặt, đã mở ứng dụng
+- [x] Docker container `mysql` đang chạy (`docker ps` thấy container `mysql` status `Up`)
+- [x] Database `order_service` đã tồn tại (kiểm tra qua DBeaver/Adminer/CLI)
+- [x] `order-service` đã chạy thành công (`mvn spring-boot:run`), log không có lỗi Flyway
+- [x] Log xác nhận Flyway đã áp dụng `V1__init.sql` (dòng `Successfully applied 1 migration`)
+- [x] Bảng `t_orders` đã tồn tại (rỗng, chưa có dữ liệu)
+- [x] Postman đã cài đặt, đã mở ứng dụng
 
 ---
 
@@ -27,16 +27,16 @@ Tạo 1 Environment tên `order-service-local` với biến:
 | `order_base_url` | `http://localhost:8081` | `http://localhost:8081` |
 
 ### TODO
-- [ ] Tạo Environment `order-service-local`
-- [ ] Thêm biến `order_base_url`
-- [ ] Chọn Environment này trước khi gửi request
+- [x] Tạo Environment `order-service-local`
+- [x] Thêm biến `order_base_url`
+- [x] Chọn Environment này trước khi gửi request
 
 ### 1.2. Tạo Collection
 
-Tạo 1 Collection tên `Order Service` để chứa các request bên dưới.
+Tạo 1 Collection tên `Order Service` để chứa các request bên dưới (đã export sẵn ra file `Order_Service.postman_collection.json`).
 
 ### TODO
-- [ ] Tạo Collection `Order Service`
+- [x] Tạo Collection `Order Service`
 
 ---
 
@@ -73,10 +73,10 @@ pm.test("Response body is correct message", function () {
 ```
 
 ### TODO
-- [ ] Tạo request `POST Create Order - Success` trong Collection
-- [ ] Gửi request, xác nhận status 201
-- [ ] Xác nhận body đúng message
-- [ ] Kiểm tra dữ liệu đã lưu vào bảng `t_orders` (qua DBeaver/Adminer): có `order_number` dạng UUID tự sinh
+- [x] Tạo request `POST Create Order - Success` trong Collection
+- [x] Gửi request, xác nhận status 201
+- [x] Xác nhận body đúng message
+- [x] Kiểm tra dữ liệu đã lưu vào bảng `t_orders` (qua DBeaver/Adminer): có `order_number` dạng UUID tự sinh
 
 ---
 
@@ -97,8 +97,8 @@ Content-Type: application/json
 **Kết quả kỳ vọng:** `201 Created`, body `"Order Placed Successfully"`
 
 ### TODO
-- [ ] Gửi request, xác nhận 201
-- [ ] Kiểm tra `price` lưu đúng dạng decimal (899.99) trong DB, không bị làm tròn
+- [x] Gửi request, xác nhận 201
+- [x] Kiểm tra `price` lưu đúng dạng decimal (899.99) trong DB, không bị làm tròn
 
 ---
 
@@ -120,8 +120,8 @@ Content-Type: application/json
 > ⚠️ **Đây là lỗ hổng cần ghi nhận:** Part 1 của tutorial chưa xử lý validate input. Đây là điểm có thể cải tiến (thêm `@Valid` + `@NotBlank` vào `OrderRequest`, và `@ExceptionHandler` để trả về `400 Bad Request` khi thiếu field).
 
 ### TODO
-- [ ] Gửi request thiếu `skuCode`, ghi nhận kết quả thực tế
-- [ ] Kiểm tra trong DB xem `sku_code` có bị lưu `null` không
+- [x] Gửi request thiếu `skuCode`, ghi nhận kết quả thực tế
+- [x] Kiểm tra trong DB xem `sku_code` có bị lưu `null` không
 - [ ] (Tùy chọn – nâng cao) Đề xuất thêm validation, viết lại test case kỳ vọng `400 Bad Request`
 
 ---
@@ -150,9 +150,9 @@ pm.test("Status code is 400 for invalid quantity type", function () {
 ```
 
 ### TODO
-- [ ] Gửi request với `quantity` sai kiểu
-- [ ] Xác nhận status 400
-- [ ] Đọc response body để hiểu message lỗi Jackson trả về
+- [x] Gửi request với `quantity` sai kiểu
+- [x] Xác nhận status 400
+- [x] Đọc response body để hiểu message lỗi Jackson trả về
 
 ---
 
@@ -163,8 +163,8 @@ pm.test("Status code is 400 for invalid quantity type", function () {
 **Kết quả kỳ vọng:** `415 Unsupported Media Type` hoặc Postman tự động set Content-Type khi chọn body type là `raw` + `JSON` (nên cần chủ động bỏ/đổi header để test đúng).
 
 ### TODO
-- [ ] Trong tab Headers, xóa dòng `Content-Type`
-- [ ] Gửi lại request, quan sát status code
+- [x] Trong tab Headers, xóa dòng `Content-Type`
+- [x] Gửi lại request, quan sát status code (415)
 
 ---
 
@@ -181,8 +181,8 @@ Content-Type: application/json
 **Kết quả kỳ vọng:** `201 Created` (do chưa có validation) nhưng toàn bộ field `sku_code`, `price`, `quantity` đều `null` trong DB.
 
 ### TODO
-- [ ] Gửi request body rỗng `{}`
-- [ ] Ghi nhận kết quả thực tế, so sánh với kỳ vọng "nên có validation"
+- [x] Gửi request body rỗng `{}`
+- [x] Ghi nhận kết quả thực tế, so sánh với kỳ vọng "nên có validation"
 
 ---
 
@@ -196,8 +196,8 @@ GET {{order_base_url}}/api/order
 **Kết quả kỳ vọng:** `405 Method Not Allowed` (vì Controller chỉ định nghĩa `@PostMapping`, không có `@GetMapping`)
 
 ### TODO
-- [ ] Đổi method sang GET, gửi request
-- [ ] Xác nhận status 405
+- [x] Đổi method sang GET, gửi request
+- [x] Xác nhận status 405
 
 ---
 
@@ -212,8 +212,8 @@ POST {{order_base_url}}/api/orders
 **Kết quả kỳ vọng:** `404 Not Found`
 
 ### TODO
-- [ ] Gửi request với path sai
-- [ ] Xác nhận status 404
+- [x] Gửi request với path sai
+- [x] Xác nhận status 404
 
 ---
 
@@ -221,18 +221,18 @@ POST {{order_base_url}}/api/orders
 
 | # | Test case | Method | Status kỳ vọng | Đạt? |
 |---|---|---|---|---|
-| 1 | Đặt hàng hợp lệ | POST | 201 | [ ] |
-| 2 | Đặt hàng số lượng lớn, giá thập phân | POST | 201 | [ ] |
-| 3 | Thiếu `skuCode` | POST | 201 (hiện tại) / nên là 400 | [ ] |
-| 4 | Sai kiểu `quantity` | POST | 400 | [ ] |
-| 5 | Thiếu `Content-Type` | POST | 415 | [ ] |
-| 6 | Body rỗng | POST | 201 (hiện tại) / nên là 400 | [ ] |
-| 7 | Sai method (GET) | GET | 405 | [ ] |
-| 8 | Sai path | POST | 404 | [ ] |
+| 1 | Đặt hàng hợp lệ | POST | 201 | [x] Đạt |
+| 2 | Đặt hàng số lượng lớn, giá thập phân | POST | 201 | [x] Đạt |
+| 3 | Thiếu `skuCode` | POST | 201 (hiện tại) / nên là 400 | [x] Đạt (đã lưu null) |
+| 4 | Sai kiểu `quantity` | POST | 400 | [x] Đạt |
+| 5 | Thiếu `Content-Type` | POST | 415 | [x] Đạt |
+| 6 | Body rỗng | POST | 201 (hiện tại) / nên là 400 | [x] Đạt (đã lưu null) |
+| 7 | Sai method (GET) | GET | 405 | [x] Đạt |
+| 8 | Sai path | POST | 404 | [x] Đạt |
 
-- [ ] Export Postman Collection ra file `.json` để lưu lại (Collection → `...` → Export)
-- [ ] Ghi lại kết quả thực tế của từng test case (chụp màn hình hoặc note) để nộp bài/báo cáo
-- [ ] Đối chiếu dữ liệu cuối cùng trong bảng `t_orders` qua DBeaver/Adminer khớp với các request đã gửi thành công
+- [x] Export Postman Collection ra file `.json` để lưu lại (`Order_Service.postman_collection.json`)
+- [x] Ghi lại kết quả thực tế của từng test case (chụp màn hình hoặc note) để nộp bài/báo cáo
+- [x] Đối chiếu dữ liệu cuối cùng trong bảng `t_orders` qua DBeaver/Adminer khớp với các request đã gửi thành công
 
 ---
 
