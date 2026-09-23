@@ -3,3 +3,8 @@
 .DS_Store
 Thumbs.db
 ~$*
+target/
+**/target/
+**/docker/mysql/data/
+**/docker/**/data/
+**/.github/modernize/
