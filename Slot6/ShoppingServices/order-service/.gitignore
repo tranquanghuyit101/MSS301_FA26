@@ -1,0 +1,16 @@
+HELP.md
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Docker data ###
+docker/mysql/data/
+docker/
+
+### IDE & Tools ###
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.github/modernize/
