@@ -1,0 +1,11 @@
+# Helper scripts
+*.py
+__pycache__/
+
+# Assignment guides & templates
+Assignment1.md
+Assignment1_Guide.md
+Assignment 1_template.docx
+
+# Generated test screenshots
+screenshots/
