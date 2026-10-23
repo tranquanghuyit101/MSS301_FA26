@@ -1,0 +1,545 @@
+{
+  "init_products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "price": 1000.0,
+      "stock": 10
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "price": 20.0,
+      "stock": 5
+    }
+  ],
+  "init_wallets": [
+    {
+      "customerId": "C1",
+      "balance": 5000.0
+    },
+    {
+      "customerId": "C2",
+      "balance": 100.0
+    }
+  ],
+  "kb1": {
+    "payload": {
+      "customerId": "C1",
+      "productId": "P1",
+      "quantity": 2,
+      "amount": 2000.0
+    },
+    "response": {
+      "amount": 2000.0,
+      "customerId": "C1",
+      "failureReason": null,
+      "id": 1,
+      "productId": "P1",
+      "quantity": 2,
+      "sagaStatus": "COMPLETED",
+      "status": "CONFIRMED"
+    },
+    "logs": [
+      {
+        "orderId": 1,
+        "step": "CREATE_ORDER",
+        "result": "SUCCESS",
+        "message": "Order PENDING",
+        "id": 1,
+        "time": "2026-10-23T09:21:27.278146"
+      },
+      {
+        "orderId": 1,
+        "step": "RESERVE_INVENTORY",
+        "result": "SUCCESS",
+        "message": "Đã giữ 2 P1",
+        "id": 2,
+        "time": "2026-10-23T09:21:27.579643"
+      },
+      {
+        "orderId": 1,
+        "step": "PROCESS_PAYMENT",
+        "result": "SUCCESS",
+        "message": "Đã thu 2000.0",
+        "id": 3,
+        "time": "2026-10-23T09:21:27.798795"
+      },
+      {
+        "orderId": 1,
+        "step": "CONFIRM_ORDER",
+        "result": "SUCCESS",
+        "message": "Saga COMPLETED",
+        "id": 4,
+        "time": "2026-10-23T09:21:27.834081"
+      }
+    ],
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ]
+  },
+  "kb2": {
+    "payload": {
+      "customerId": "C2",
+      "productId": "P1",
+      "quantity": 1,
+      "amount": 1000.0
+    },
+    "response": {
+      "amount": 1000.0,
+      "customerId": "C2",
+      "failureReason": "402 - Số dư không đủ: còn 100.0, cần 1000.0",
+      "id": 2,
+      "productId": "P1",
+      "quantity": 1,
+      "sagaStatus": "COMPENSATED",
+      "status": "CANCELLED"
+    },
+    "logs": [
+      {
+        "orderId": 2,
+        "step": "CREATE_ORDER",
+        "result": "SUCCESS",
+        "message": "Order PENDING",
+        "id": 5,
+        "time": "2026-10-23T09:21:28.949325"
+      },
+      {
+        "orderId": 2,
+        "step": "RESERVE_INVENTORY",
+        "result": "SUCCESS",
+        "message": "Đã giữ 1 P1",
+        "id": 6,
+        "time": "2026-10-23T09:21:29.009741"
+      },
+      {
+        "orderId": 2,
+        "step": "SAGA",
+        "result": "FAILED",
+        "message": "402 - Số dư không đủ: còn 100.0, cần 1000.0",
+        "id": 7,
+        "time": "2026-10-23T09:21:29.089897"
+      },
+      {
+        "orderId": 2,
+        "step": "COMPENSATION",
+        "result": "SUCCESS",
+        "message": "Lần thử 1",
+        "id": 8,
+        "time": "2026-10-23T09:21:29.189482"
+      },
+      {
+        "orderId": 2,
+        "step": "CANCEL_ORDER",
+        "result": "SUCCESS",
+        "message": "Saga COMPENSATED",
+        "id": 9,
+        "time": "2026-10-23T09:21:29.221207"
+      }
+    ],
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ],
+    "reservations": [
+      {
+        "orderId": 1,
+        "productId": "P1",
+        "quantity": 2,
+        "status": "RESERVED"
+      },
+      {
+        "orderId": 2,
+        "productId": "P1",
+        "quantity": 1,
+        "status": "RELEASED"
+      }
+    ]
+  },
+  "kb3": {
+    "payload": {
+      "customerId": "C1",
+      "productId": "P2",
+      "quantity": 100,
+      "amount": 2000.0
+    },
+    "response": {
+      "amount": 2000.0,
+      "customerId": "C1",
+      "failureReason": "409 - Không đủ hàng: còn 5, cần 100",
+      "id": 3,
+      "productId": "P2",
+      "quantity": 100,
+      "sagaStatus": "COMPENSATED",
+      "status": "CANCELLED"
+    },
+    "logs": [
+      {
+        "orderId": 3,
+        "step": "CREATE_ORDER",
+        "result": "SUCCESS",
+        "message": "Order PENDING",
+        "id": 10,
+        "time": "2026-10-23T09:21:29.836368"
+      },
+      {
+        "orderId": 3,
+        "step": "SAGA",
+        "result": "FAILED",
+        "message": "409 - Không đủ hàng: còn 5, cần 100",
+        "id": 11,
+        "time": "2026-10-23T09:21:29.883327"
+      },
+      {
+        "orderId": 3,
+        "step": "CANCEL_ORDER",
+        "result": "SUCCESS",
+        "message": "Saga COMPENSATED",
+        "id": 12,
+        "time": "2026-10-23T09:21:29.937711"
+      }
+    ],
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ]
+  },
+  "kb4": {
+    "payload": {
+      "customerId": "C1",
+      "productId": "P9",
+      "quantity": 1,
+      "amount": 10.0
+    },
+    "response": {
+      "amount": 10.0,
+      "customerId": "C1",
+      "failureReason": "404 - Không tìm thấy sản phẩm P9",
+      "id": 4,
+      "productId": "P9",
+      "quantity": 1,
+      "sagaStatus": "COMPENSATED",
+      "status": "CANCELLED"
+    },
+    "logs": [
+      {
+        "orderId": 4,
+        "step": "CREATE_ORDER",
+        "result": "SUCCESS",
+        "message": "Order PENDING",
+        "id": 13,
+        "time": "2026-10-23T09:21:30.527117"
+      },
+      {
+        "orderId": 4,
+        "step": "SAGA",
+        "result": "FAILED",
+        "message": "404 - Không tìm thấy sản phẩm P9",
+        "id": 14,
+        "time": "2026-10-23T09:21:30.563343"
+      },
+      {
+        "orderId": 4,
+        "step": "CANCEL_ORDER",
+        "result": "SUCCESS",
+        "message": "Saga COMPENSATED",
+        "id": 15,
+        "time": "2026-10-23T09:21:30.610384"
+      }
+    ],
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ]
+  },
+  "kb5": {
+    "payload": {
+      "customerId": "C9",
+      "productId": "P2",
+      "quantity": 1,
+      "amount": 20.0
+    },
+    "response": {
+      "amount": 20.0,
+      "customerId": "C9",
+      "failureReason": "404 - Không tìm thấy ví của C9",
+      "id": 5,
+      "productId": "P2",
+      "quantity": 1,
+      "sagaStatus": "COMPENSATED",
+      "status": "CANCELLED"
+    },
+    "logs": [
+      {
+        "orderId": 5,
+        "step": "CREATE_ORDER",
+        "result": "SUCCESS",
+        "message": "Order PENDING",
+        "id": 16,
+        "time": "2026-10-23T09:21:31.20516"
+      },
+      {
+        "orderId": 5,
+        "step": "RESERVE_INVENTORY",
+        "result": "SUCCESS",
+        "message": "Đã giữ 1 P2",
+        "id": 17,
+        "time": "2026-10-23T09:21:31.253974"
+      },
+      {
+        "orderId": 5,
+        "step": "SAGA",
+        "result": "FAILED",
+        "message": "404 - Không tìm thấy ví của C9",
+        "id": 18,
+        "time": "2026-10-23T09:21:31.287479"
+      },
+      {
+        "orderId": 5,
+        "step": "COMPENSATION",
+        "result": "SUCCESS",
+        "message": "Lần thử 1",
+        "id": 19,
+        "time": "2026-10-23T09:21:31.389738"
+      },
+      {
+        "orderId": 5,
+        "step": "CANCEL_ORDER",
+        "result": "SUCCESS",
+        "message": "Saga COMPENSATED",
+        "id": 20,
+        "time": "2026-10-23T09:21:31.427345"
+      }
+    ],
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ]
+  },
+  "kb6": {
+    "payload": {
+      "customerId": "C1",
+      "productId": "P2",
+      "quantity": 1,
+      "amount": 20.0
+    },
+    "response": {
+      "amount": 20.0,
+      "customerId": "C1",
+      "failureReason": "Service không phản hồi: I/O error on POST request for \"http://payment-service:8083/api/payments/pay\": HTTP connect timed out",
+      "id": 6,
+      "productId": "P2",
+      "quantity": 1,
+      "sagaStatus": "COMPENSATED",
+      "status": "CANCELLED"
+    },
+    "logs": [
+      {
+        "orderId": 6,
+        "step": "CREATE_ORDER",
+        "result": "SUCCESS",
+        "message": "Order PENDING",
+        "id": 21,
+        "time": "2026-10-23T09:21:34.764754"
+      },
+      {
+        "orderId": 6,
+        "step": "RESERVE_INVENTORY",
+        "result": "SUCCESS",
+        "message": "Đã giữ 1 P2",
+        "id": 22,
+        "time": "2026-10-23T09:21:34.80913"
+      },
+      {
+        "orderId": 6,
+        "step": "SAGA",
+        "result": "FAILED",
+        "message": "Service không phản hồi: I/O error on POST request for \"http://payment-service:8083/api/payments/pay\": HTTP connect timed out",
+        "id": 23,
+        "time": "2026-10-23T09:21:36.834932"
+      },
+      {
+        "orderId": 6,
+        "step": "COMPENSATION",
+        "result": "SUCCESS",
+        "message": "Lần thử 1",
+        "id": 24,
+        "time": "2026-10-23T09:21:36.976349"
+      },
+      {
+        "orderId": 6,
+        "step": "CANCEL_ORDER",
+        "result": "SUCCESS",
+        "message": "Saga COMPENSATED",
+        "id": 25,
+        "time": "2026-10-23T09:21:37.035109"
+      }
+    ],
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ]
+  },
+  "kb7": {
+    "rel1": "RELEASED",
+    "rel2": "RELEASED",
+    "resv_response": {
+      "orderId": 1,
+      "productId": "P1",
+      "quantity": 2,
+      "status": "RESERVED"
+    },
+    "pay_response": {
+      "amount": 2000.0,
+      "customerId": "C1",
+      "orderId": 1,
+      "status": "PAID"
+    },
+    "ref": "REFUNDED",
+    "products": [
+      {
+        "id": "P1",
+        "name": "Laptop",
+        "price": 1000.0,
+        "stock": 8
+      },
+      {
+        "id": "P2",
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 5
+      }
+    ],
+    "wallets": [
+      {
+        "customerId": "C1",
+        "balance": 3000.0
+      },
+      {
+        "customerId": "C2",
+        "balance": 100.0
+      }
+    ]
+  }
+}
