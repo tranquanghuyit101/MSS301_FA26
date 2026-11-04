@@ -1,0 +1,46 @@
+# [TODO-2.2, TODO-6.1: datasource DBWatch + naming strategy, Feign timeout, cấu hình saga]
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ms-watch
+  datasource:
+    url: jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=DBWatch;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: ${DB_PASSWORD:YourStrong@Password123}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+      naming:
+        # Giữ NGUYÊN tên trong @Table/@Column (StoreAccounts, WatchID...) đúng như đề bài.
+        # Mặc định Spring Boot đổi thành store_accounts, watch_id...
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000     # ms - MSBrand tắt -> lỗi nhanh, không treo request
+            read-timeout: 5000
+
+# Địa chỉ MSBrand (participant của Saga). Docker: http://ms-brand:8082
+brand-service:
+  url: ${BRAND_SERVICE_URL:http://localhost:8082}
+
+saga:
+  fault-injection:
+    # true: cho phép header X-Saga-Fail-After-Step để GIẢ LẬP lỗi khi test/demo Saga.
+    # Môi trường production phải đặt false (SAGA_FAULT_INJECTION=false).
+    enabled: ${SAGA_FAULT_INJECTION:true}
+  compensation:
+    max-attempts: 3       # compensation phải "Reliable" -> thử lại tối đa 3 lần
+    backoff-ms: 1000
+
+logging:
+  level:
+    com.mss301.watch.service.saga: INFO
+    com.mss301.watch.client: DEBUG   # in ra các lời gọi Feign sang MSBrand (cần Logger.Level trong AppConfig)
