@@ -1,0 +1,523 @@
+{
+  "info": {
+    "name": "MSS301 - Microservices Shopping Collection",
+    "description": "Postman Collection test toàn diện cho hệ thống Microservices: API Gateway (9000), Keycloak (8181), Product (8080), Order (8081), Inventory (8082).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "gateway_url",
+      "value": "http://localhost:9000",
+      "type": "string"
+    },
+    {
+      "key": "keycloak_token_url",
+      "value": "http://localhost:8181/realms/spring-microservices-realm/protocol/openid-connect/token",
+      "type": "string"
+    },
+    {
+      "key": "client_id",
+      "value": "spring-microservices-client",
+      "type": "string"
+    },
+    {
+      "key": "client_secret",
+      "value": "mss301-dev-secret-change-me",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication (Keycloak)",
+      "item": [
+        {
+          "name": "1.1 Get Access Token (Client Credentials)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Token received\", function () {",
+                  "    pm.expect(jsonData.access_token).to.not.be.empty;",
+                  "});",
+                  "pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+                  "console.log(\"Saved access_token to collection variables:\", jsonData.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{client_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{client_secret}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_token_url}}",
+              "host": ["{{keycloak_token_url}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. API Gateway & Security",
+      "item": [
+        {
+          "name": "2.1 Actuator Health (Public - 200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Status is UP\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"UP\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/actuator/health",
+              "host": ["{{gateway_url}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 Negative Test - No Token (Expect 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Header WWW-Authenticate exists\", function () {",
+                  "    pm.expect(pm.response.headers.has(\"WWW-Authenticate\")).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/products",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Product Service (via Gateway)",
+      "item": [
+        {
+          "name": "3.1 Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.test(\"Product has id and correct fields\", function () {",
+                  "    pm.expect(jsonData.id).to.not.be.empty;",
+                  "    pm.expect(jsonData.name).to.eql(\"iPhone 15\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"iPhone 15\",\n  \"description\": \"iPhone 15 is a smartphone from Apple\",\n  \"price\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/products",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 Get All Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/products",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Inventory Service (via Gateway)",
+      "item": [
+        {
+          "name": "4.1 Check Stock (iphone_15, qty=100 -> true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Stock is available (true)\", function () {",
+                  "    pm.expect(pm.response.text()).to.eql(\"true\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/inventory?skuCode=iphone_15&quantity=100",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "inventory"],
+              "query": [
+                {
+                  "key": "skuCode",
+                  "value": "iphone_15"
+                },
+                {
+                  "key": "quantity",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 Check Stock (iphone_15, qty=101 -> false)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Stock is not enough (false)\", function () {",
+                  "    pm.expect(pm.response.text()).to.eql(\"false\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/inventory?skuCode=iphone_15&quantity=101",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "inventory"],
+              "query": [
+                {
+                  "key": "skuCode",
+                  "value": "iphone_15"
+                },
+                {
+                  "key": "quantity",
+                  "value": "101"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Order Service (via Gateway - OpenFeign Call)",
+      "item": [
+        {
+          "name": "5.1 Place Order Success (qty=1 -> 201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Order placed successfully\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Order Placed Successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skuCode\": \"iphone_15\",\n  \"price\": 1000,\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/order",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "order"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 Place Order Fail - Out of Stock (qty=101 -> 500)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500 Internal Server Error\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skuCode\": \"iphone_15\",\n  \"price\": 1000,\n  \"quantity\": 101\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/order",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "order"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Direct Call (Without Gateway)",
+      "item": [
+        {
+          "name": "6.1 Direct Order Service (:8081)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skuCode\": \"iphone_15\",\n  \"price\": 1000,\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/order",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "order"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.2 Direct Inventory Service (:8082)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/inventory?skuCode=iphone_15&quantity=100",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "inventory"],
+              "query": [
+                {
+                  "key": "skuCode",
+                  "value": "iphone_15"
+                },
+                {
+                  "key": "quantity",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
