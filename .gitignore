@@ -8,3 +8,9 @@ target/
 **/docker/mysql/data/
 **/docker/**/data/
 **/.github/modernize/
+**/.git_standalone/
+.env
+**/.env
+*.log
+**/.vscode/
+.vscode/
