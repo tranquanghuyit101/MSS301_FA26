@@ -1,0 +1,76 @@
+# [TODO-7.1, TODO-7.2, TODO-7.6: routes, CircuitBreaker, TimeLimiter 15s]
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:            # route của Gateway server WebFlux: spring.cloud.gateway.server.webflux.routes
+          routes:
+            - id: account-service
+              uri: ${ACCOUNT_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: accountCB
+                    fallbackUri: forward:/fallback/account
+
+            - id: brand-service
+              uri: ${BRAND_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/brands/**        # KHÔNG route /internal/** -> API nội bộ của Saga không lộ ra ngoài
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: brandCB
+                    fallbackUri: forward:/fallback/brand
+
+            - id: watch-service
+              uri: ${WATCH_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/watches/**,/api/sagas/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: watchCB
+                    fallbackUri: forward:/fallback/watch
+
+jwt:
+  secret: ${JWT_SECRET:mss301-watch-management-secret-key-2025-very-long-string}
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+    instances:
+      accountCB:
+        base-config: default
+      brandCB:
+        base-config: default
+      watchCB:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        # Saga có thể mất vài giây (compensation retry 3 lần x 1s).
+        # Nếu để mặc định 1s, Gateway sẽ trả fallback 503 trong khi Saga ở MSWatch vẫn đang chạy.
+        timeout-duration: 15s
+    instances:              # khai báo rõ cho từng CB để chắc chắn áp dụng 15s
+      accountCB:
+        base-config: default
+      brandCB:
+        base-config: default
+      watchCB:
+        base-config: default
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
